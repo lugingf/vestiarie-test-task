@@ -1,0 +1,147 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Vestiaire test task",
+    "title": "Vestiaire",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "paths": {
+    "/payouts": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "member"
+        ],
+        "summary": "Creating payout from the given list of items",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "add_member",
+            "description": "Параметры для добавления участника очереди",
+            "schema": {
+              "$ref": "#/definitions/AddMemberRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MemberPositionListResponse"
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AddMemberRequest": {
+      "required": [
+        "polygon_id",
+        "member_id",
+        "member_type",
+        "tariffs",
+        "priority"
+      ],
+      "properties": {
+        "polygon_id": {
+          "description": "Id полигона очереди",
+          "type": "integer",
+          "format": "int64",
+          "x-nullable": false
+        },
+        "member_id": {
+          "description": "Id участника",
+          "type": "integer",
+          "format": "int64",
+          "x-nullable": false
+        },
+        "member_type": {
+          "description": "Тип участника очереди",
+          "type": "string",
+          "enum": [
+            "driver",
+            "courier"
+          ],
+          "x-nullable": false
+        },
+        "tariffs": {
+          "description": "Набор тарифов, в рамках которых участник становится в очередь",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "priority": {
+          "type": "number",
+          "format": "float",
+          "description": "Приоритет участника",
+          "x-nullable": false
+        }
+      }
+    },
+    "MembersPositionListResponse": {
+      "required": [
+        "members_positions"
+      ],
+      "properties": {
+        "members_positions": {
+          "description": "Массив позиций по каждому участнику",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MemberPositionListResponse"
+          }
+        }
+      }
+    },
+    "MemberPositionListResponse": {
+      "required": [
+        "positions"
+      ],
+      "properties": {
+        "member_id": {
+          "description": "Id участника",
+          "type": "integer",
+          "format": "int64",
+          "x-nullable": true
+        },
+        "positions": {
+          "description": "Позиции в очереди",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueuePosition"
+          }
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "description": "Сообщение об ошибке",
+          "type": "string",
+          "example": "Не удалось добавить участника"
+        }
+      }
+    }
+  }
+}
