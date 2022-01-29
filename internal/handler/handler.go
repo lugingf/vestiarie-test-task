@@ -18,6 +18,13 @@ func NewPayoutHandler(s *domain.PayoutService) (*PayoutHandler, error) {
 func (h *PayoutHandler) PostPayouts(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
+	updateId := r.Header.Get("PaymentUpdateID")
+	if updateId == "" {
+		log.Printf("No header PaymentUpdateID")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("No header PaymentUpdateID"))
+	}
+
 	items := make([]domain.Item, 0)
 	err := decoder.Decode(&items)
 
@@ -27,7 +34,7 @@ func (h *PayoutHandler) PostPayouts(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Cant get request body"))
 	}
 
-	payouts, err := h.Service.StorePayouts(items)
+	payouts, err := h.Service.StorePayouts(items, updateId)
 	if err != nil {
 		log.Printf("Cant save payouts. Error: %v", err.Error())
 		h.writeCommonError(w)

@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"github.com/google/uuid"
 	"github.com/lugingf/vestiarie-test-task/internal"
 	"github.com/lugingf/vestiarie-test-task/internal/storage"
 	"github.com/pkg/errors"
@@ -17,8 +16,8 @@ func NewPayoutService(s *storage.PayoutStorage) *PayoutService {
 	}
 }
 
-func (p *PayoutService)StorePayouts(items []Item) ([]storage.Payout, error) {
-	payouts := p.calculatePayouts(items)
+func (p *PayoutService)StorePayouts(items []Item, updateID string) ([]storage.Payout, error) {
+	payouts := p.calculatePayouts(items, updateID)
 
 	db := *p.Storage
 	err := db.SavePayouts(payouts)
@@ -28,7 +27,7 @@ func (p *PayoutService)StorePayouts(items []Item) ([]storage.Payout, error) {
 	return payouts, nil
 }
 
-func (p *PayoutService) calculatePayouts(items []Item) []storage.Payout {
+func (p *PayoutService) calculatePayouts(items []Item, updateID string) []storage.Payout {
 	payoutsBySellerAndCurrency := make(map[int64]map[internal.Currency]storage.Payout)
 
 	for _, item := range items {
@@ -37,14 +36,22 @@ func (p *PayoutService) calculatePayouts(items []Item) []storage.Payout {
 
 		// new seller (and new currency as well)
 		if _, ok := payoutsBySellerAndCurrency[seller]; !ok {
-
+			sellersPayoutsByCurrency := make(map[internal.Currency]storage.Payout)
+			payout := storage.Payout{
+				UpdateID: updateID,
+				SellerID: seller,
+				Amount:   item.Price,
+				Currency: currency,
+			}
+			sellersPayoutsByCurrency[currency] = payout
+			payoutsBySellerAndCurrency[seller] = sellersPayoutsByCurrency
 			continue
 		}
 
 		// already have the seller, but new currency for them
 		if _, ok := payoutsBySellerAndCurrency[seller][currency]; !ok {
 			payout := storage.Payout{
-				UpdateID: uuid.UUID{},
+				UpdateID: updateID,
 				SellerID: seller,
 				Amount:   item.Price,
 				Currency: currency,
@@ -67,19 +74,4 @@ func (p *PayoutService) calculatePayouts(items []Item) []storage.Payout {
 	}
 
 	return payouts
-}
-
-func (p *PayoutService) addNewSellerPayout(payoutsBySellerAndCurrency map[int64]map[internal.Currency]storage.Payout, item Item) {
-	sellersPayoutsByCurrency := make(map[internal.Currency]storage.Payout)
-	seller := item.SellerID
-	currency := internal.Currency(item.Currency)
-
-	payout := storage.Payout{
-		UpdateID: uuid.UUID{},
-		SellerID: seller,
-		Amount:   item.Price,
-		Currency: currency,
-	}
-	sellersPayoutsByCurrency[currency] = payout
-	payoutsBySellerAndCurrency[seller] = sellersPayoutsByCurrency
 }

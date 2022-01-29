@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
-	"time"
 	"github.com/lugingf/vestiarie-test-task/internal/domain"
 	"github.com/lugingf/vestiarie-test-task/internal/handler"
 	"github.com/lugingf/vestiarie-test-task/internal/storage"
 	"github.com/lugingf/vestiarie-test-task/resources"
+	"log"
+	"net/http"
+	"time"
 )
 
 func main() {

@@ -14,10 +14,19 @@ services:
       - "3306:3306"
     networks:
       - default
+    container_name: database
 
-  test-app:
+  vestiarie-test-task:
     build:
       context: .
       dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    links:
+      - db
+    container_name: app
     networks:
       - default
+    command: sh -c "sleep 15 && /dist/vestiarie-test-task"

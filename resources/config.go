@@ -40,7 +40,7 @@ func dbConfig() *DataBaseConfig {
 		Driver:   "mysql",
 		User:     "gotest",
 		Password: "gotest",
-		Host:     "127.0.0.1",
+		Host:     "database",
 		Port:     "3306",
 		Name:     "local_gotest",
 	}
