@@ -15,7 +15,7 @@ type ResourceContainer struct {
 	SQLShard  *sql.DB
 }
 
-// Init FIXME should be "sync.Once" or something
+// Init should be "sync.Once" or something
 func Init() *ResourceContainer {
 	cfg, err := NewConfig()
 	if err != nil {
@@ -48,15 +48,31 @@ func initDB(config *DataBaseConfig) (*sql.DB, error) {
 	return sql.Open(driver, connectString)
 }
 
+// Draft. I'd prefer to separate migrations and service start
 func makeMigrations(db *sql.DB) error {
 	_, err := db.Exec(`
-	  CREATE TABLE IF NOT EXISTS payouts (
+	  CREATE TABLE IF NOT EXISTS item (
+	    id bigint PRIMARY KEY AUTO_INCREMENT,
 		update_id varchar(16),
-		seller_id integer ,
-		amount integer,
+		item_name varchar(256),
+		price float,
 		currency varchar(4),
+	    seller_id integer,
+	    INDEX ix_update_id(update_id)
+	  );
+`)
+	if err != nil {
+		return errors.Wrap(err, "Can't make migration item")
+	}
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS payout (
+	    id bigint PRIMARY KEY AUTO_INCREMENT,
+		update_id varchar(16),
+		seller_id integer,
+		amount float,
+		currency varchar(4),
+        item_id_list text,
 	    UNIQUE INDEX ux_sel_cur_upd(seller_id, currency, update_id)
 	  );
 `)
-	return errors.Wrap(err, "Can't make migrations")
+	return errors.Wrap(err, "Can't make migration payout")
 }

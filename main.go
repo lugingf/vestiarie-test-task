@@ -16,7 +16,8 @@ func main() {
 	di := resources.Init()
 
 	payoutStorage := storage.NewPayoutStorageSQL(di.SQLShard)
-	s := domain.NewPayoutService(&payoutStorage)
+	itemStorage := storage.NewItemStorageSQL(di.SQLShard)
+	s := domain.NewPayoutService(&payoutStorage, &itemStorage)
 
 	ph, err := handler.NewPayoutHandler(s)
 	if err != nil {
