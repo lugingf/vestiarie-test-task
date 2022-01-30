@@ -37,8 +37,9 @@ func (p *PayoutStorageSQL) SavePayouts(payouts []Payout) error {
 			payout.Amount,
 			payout.Currency,
 			string(itemListb),
+			payout.Part,
 		}...)
-		values = fmt.Sprintf("%v %v", values, "(?, ?, ?, ?, ?),")
+		values = fmt.Sprintf("%v %v", values, "(?, ?, ?, ?, ?, ?),")
 	}
 	trimmed := strings.Trim(values, ",")
 	insertScript := `
@@ -48,7 +49,8 @@ func (p *PayoutStorageSQL) SavePayouts(payouts []Payout) error {
 			seller_id, 
 			amount, 
 			currency,
-			item_id_list)
+			item_id_list,
+			payout_part)
 		VALUES %v
 		ON DUPLICATE KEY UPDATE
 			update_id = VALUES(update_id)

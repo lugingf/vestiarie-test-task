@@ -10,6 +10,8 @@ import (
 
 var Di *ResourceContainer
 
+var ErrUpdateIdExists = errors.New("update_id already exists")
+
 type ResourceContainer struct {
 	AppConfig *Config
 	SQLShard  *sql.DB
@@ -71,6 +73,7 @@ func makeMigrations(db *sql.DB) error {
 		amount float,
 		currency varchar(4),
         item_id_list text,
+        payout_part integer,
 	    UNIQUE INDEX ux_sel_cur_upd(seller_id, currency, update_id)
 	  );
 `)

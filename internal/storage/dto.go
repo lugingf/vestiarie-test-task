@@ -5,12 +5,13 @@ import (
 )
 
 type Payout struct {
-	ID       int64
-	UpdateID string
-	SellerID int64
-	Amount   float64
-	Currency internal.Currency
+	ID         int64
+	UpdateID   string
+	SellerID   int64
+	Amount     float64
+	Currency   internal.Currency
 	ItemIDList []int64
+	Part       int64
 }
 
 type Item struct {

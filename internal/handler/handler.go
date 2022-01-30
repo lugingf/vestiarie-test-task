@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/lugingf/vestiarie-test-task/internal/domain"
+	"github.com/lugingf/vestiarie-test-task/resources"
 	"log"
 	"net/http"
 )
@@ -35,6 +37,11 @@ func (h *PayoutHandler) PostPayouts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	payouts, err := h.Service.StorePayouts(items, updateId)
+	if err == resources.ErrUpdateIdExists {
+		log.Printf("PaymentUpdateID: %s Error: %v",updateId,  err.Error())
+		w.Write([]byte(fmt.Sprintf("PaymentUpdateID: %s is already exists",updateId)))
+		return
+	}
 	if err != nil {
 		log.Printf("Cant save payouts. Error: %v", err.Error())
 		h.writeCommonError(w)
