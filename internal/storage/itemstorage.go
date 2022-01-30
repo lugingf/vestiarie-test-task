@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/pkg/errors"
-	"log"
 	"strings"
 )
 
@@ -114,7 +113,6 @@ func (p *ItemStorageSQL) CheckUpdateID(updateID string) (bool, error) {
 	defer stmt.Close()
 
 	rows, err := stmt.Query(updateID)
-	log.Print(err)
 	var count int64
 	for rows.Next() {
 		rows.Scan(&count)
